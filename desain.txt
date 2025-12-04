@@ -1,0 +1,123 @@
+
+## 1\. 🏗️ Struktur File Dasar & Konfigurasi
+
+Semua halaman publik akan memanggil `config/koneksi.php` dan menggunakan `includes/header.php` dan `includes/footer.php` untuk konsistensi desain.
+
+| File/Folder | Lokasi | Keterangan |
+| :--- | :--- | :--- |
+| `index.php` | Root | Halaman Utama (Home). |
+| `ditemukan.php` | Root | Daftar Barang Ditemukan. |
+| `hilang.php` | Root | Daftar Barang Hilang. |
+| `laporkan.php` | Root | Form Pelaporan. |
+| `login.php`, `register.php` | Root | Otentikasi Pengguna. |
+| **`config/koneksi.php`** | `config/` | **File Konfigurasi Database (MySQLi) dan Variabel Sistem.** |
+| `includes/header.php` | `includes/` | Header, Navigasi Utama, dan AOS CSS. |
+| `includes/footer.php` | `includes/` | Footer, Copyright, dan Script JS/AOS. |
+| **`admin/dashboard.php`** | `admin/` | Dashboard Admin. |
+| **`admin/klaim_tertunda.php`** | `admin/` | **Modul Verifikasi Klaim (Inti).** |
+
+### File Konfigurasi: `config/koneksi.php`
+
+File ini digunakan untuk menghubungkan aplikasi web ke database MySQL.
+
+```php
+<?php
+// Konfigurasi Zona Waktu
+date_default_timezone_set('Asia/Jakarta');
+
+// --- KREDENSIAL DATABASE MySQL ---
+define('DB_HOST', 'localhost');
+define('DB_USER', 'root');
+define('DB_PASS', 'password_anda'); // Ganti dengan password Anda
+define('DB_NAME', 'lofu_skansa');
+
+// --- FUNGSI KONEKSI ---
+$koneksi = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+
+if (mysqli_connect_errno()) {
+    die("Koneksi database gagal: " . mysqli_connect_error());
+}
+
+// --- VARIABEL SISTEM ---
+define('LEVEL_SISWA', 1);
+define('LEVEL_ADMIN', 99); 
+?>
+```
+
+-----
+
+## 2\. 🎨 Desain UI/UX Publik (Home, Daftar, Lapor)
+
+Desain menggunakan palet warna SMK 1 Bawang untuk tampilan profesional dan bersih.
+
+### A. Halaman Utama (`index.php`) - Dinamis dengan AOS 🌟
+
+| Bagian | Desain & Interaksi (AOS Effect) | Konten Inti |
+| :--- | :--- | :--- |
+| **Hero Section** | Gambar Sekolah (full-width) dengan *overlay* tipis. **AOS:** `fade-up`. | Judul Besar: **"Ayo Temukan Milikmu, Kembalikan Hak Orang Lain."** *Search bar* di tengah. |
+| **Statistik** | Tiga kartu angka besar (Ditemukan, Hilang, Kembali). **AOS:** `zoom-in`. | Data Real-time dari database. |
+| **Daftar Terbaru** | Grid 3 kolom menampilkan **6 item terbaru Ditemukan**. Kartu Barang dengan foto dominan, nama, dan tanggal. **AOS:** `fade-up` (staggered). | Menarik perhatian pengguna untuk melihat barang yang baru ditemukan. |
+| **Call-to-Action** | Dua tombol besar: **"Laporkan Barang Ditemukan"** (Hijau) dan **"Laporkan Barang Hilang"** (Biru). | Mendorong partisipasi pengguna. |
+
+### B. Halaman Daftar Barang (`ditemukan.php` / `hilang.php`)
+
+  * **Filter & Pencarian:** Sidebar di kiri (desktop) atau tombol *collapse* di atas (mobile) untuk menyaring berdasarkan **Kategori, Lokasi, dan Tanggal**.
+  * **Tampilan Item:** Menggunakan **Card View (Grid)**. Setiap kartu memuat:
+      * **Foto Barang** (Terbesar).
+      * **Nama Barang (Bold)**.
+      * **Lokasi Kejadian** (Abu-abu).
+      * **Status** (Badge: *Aktif* / *Tertunda Klaim*).
+
+### C. Formulir Pelaporan (`laporkan.php`)
+
+  * **Fokus:** Formulir yang *clean* dengan label jelas. Wajib login.
+  * **Input Wajib:** Nama Barang, Kategori (*Dropdown*), Lokasi, Waktu Kejadian.
+  * **Foto Bukti:** Area *drag-and-drop* untuk unggah foto (maks. 3).
+
+-----
+
+## 3\. 🔒 Halaman Admin & Verifikasi Klaim
+
+Halaman yang hanya dapat diakses oleh *user* dengan `level = 99`.
+
+### A. Dashboard Admin (`admin/dashboard.php`)
+
+  * **Layout:** Sidebar Navigasi (kiri, warna gelap) dan Konten Utama.
+  * **Notifikasi Penting:** Menu **"Verifikasi Klaim"** harus memiliki **badge merah** menunjukkan jumlah klaim yang **Tertunda**.
+  * **Kartu Statistik:** Fokus pada **Klaim Tertunda**, Barang Aktif, dan Jumlah User.
+
+### B. Modul Verifikasi Klaim (Inti Aplikasi)
+
+#### Halaman `admin/klaim_tertunda.php`
+
+Menampilkan daftar klaim yang perlu diverifikasi:
+
+| Kolom | Deskripsi |
+| :--- | :--- |
+| **Barang Diklaim** | Nama Barang (Link ke detail). |
+| **Pengaju Klaim** | Nama Siswa/Guru (Link ke profil). |
+| **Diajukan Pada** | Waktu pengajuan. |
+| **Aksi** | Tombol **"Lihat Bukti & Verifikasi"** (Tombol Kontras). |
+
+#### Proses Verifikasi (Modal)
+
+Saat Admin mengklik "Lihat Bukti & Verifikasi," *modal* akan muncul:
+
+1.  **Informasi Barang:** Detail deskripsi ciri-ciri yang dilaporkan oleh penemu awal.
+2.  **Bukti Klaim Pengaju:**
+      * **Keterangan:** Teks verifikasi dari pemilik.
+      * **Foto Bukti:** *Thumbnail* **Bukti Foto Serah Terima** atau **ID Pemilik** yang diunggah. Admin dapat mengklik untuk melihat foto penuh (Lightbox).
+3.  **Area Keputusan:**
+      * **✅ Setujui Klaim & Selesaikan:** (Tombol Hijau) Sistem mengubah status barang menjadi **"Selesai"** dan menghapusnya dari tampilan publik.
+      * **❌ Tolak Klaim:** (Tombol Merah) Klaim ditolak, barang tetap **"Aktif"** di daftar Ditemukan.
+
+-----
+
+## 4\. 📊 Skema Database MySQL (`lofu_skansa`)
+
+| Tabel | Kolom Kunci & Data Penting | Keterangan |
+| :--- | :--- | :--- |
+| `users` | `user_id`, `nisn_nip` (Unik), `level` | Otentikasi seluruh anggota sekolah. |
+| `barang` | `barang_id`, `jenis_laporan`, `user_id_pelapor`, `status_barang` | Daftar semua laporan (inti). |
+| `media` | `media_id`, `barang_id`, `file_path` | Menyimpan path foto (maks. 3 per barang). |
+| `klaim` | `klaim_id`, `barang_id`, `user_id_pengaju`, **`bukti_foto_path`**, `status_klaim` | Proses verifikasi dan bukti klaim. |
