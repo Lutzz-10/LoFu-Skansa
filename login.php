@@ -58,8 +58,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <div class="container mt-5">
 <div class="row justify-content-center">
     <div class="col-md-5">
-        <div class="card shadow-sm" data-aos="fade-up">
-            <div class="card-header text-center bg-primary text-white">
+        <div class="card shadow-sm">
+            <div class="card-header text-center bg-secondary text-white">
                 <h2>Login</h2>
             </div>
             <div class="card-body p-4">

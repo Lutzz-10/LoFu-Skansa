@@ -29,8 +29,8 @@
             border-color: var(--primary-color);
         }
         .btn-warning {
-            background-color: var(--secondary-color);
-            border-color: var(--secondary-color);
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
         }
         .navbar-brand {
             display: flex;
@@ -46,7 +46,7 @@
             transition: background-color 0.2s ease-in-out;
         }
         .navbar-nav .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(252, 5, 5, 0.1);
         }
         .btn-success {
             transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
