@@ -11,8 +11,8 @@
     <!-- Custom CSS -->
     <style>
         :root {
-            --primary-color: #003366; /* Deep Blue from Logo */
-            --secondary-color: #FFD700; /* Yellow from Logo */
+            --primary-color: #e20a15ff;
+            --secondary-color: #2600ffff; 
             --light-gray: #f8f9fa;
         }
         body {
